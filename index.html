@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Howell Strain — Infrastructure & Automation Engineer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:        #0d1117;
+      --surface:   #161b22;
+      --border:    #21262d;
+      --accent:    #58a6ff;
+      --accent2:   #3fb950;
+      --accent3:   #f78166;
+      --text:      #e6edf3;
+      --muted:     #8b949e;
+      --tag-bg:    #1f2937;
+      --mono:      'IBM Plex Mono', monospace;
+      --sans:      'IBM Plex Sans', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    /* ── Grain overlay ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* ── Layout ── */
+    .shell {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 3rem 2rem 6rem;
+    }
+
+    /* ── Terminal prompt header ── */
+    .prompt-bar {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 2.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      opacity: 0;
+      animation: fadeUp 0.5s ease forwards;
+    }
+    .prompt-bar .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+    .dot-r { background: #ff5f57; }
+    .dot-y { background: #febc2e; }
+    .dot-g { background: #28c840; }
+    .prompt-bar .path { color: var(--accent2); margin-left: 1rem; }
+    .prompt-bar .cmd { color: var(--text); }
+    .cursor {
+      display: inline-block;
+      width: 8px; height: 14px;
+      background: var(--accent);
+      margin-left: 2px;
+      vertical-align: middle;
+      animation: blink 1.1s step-end infinite;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      border-left: 3px solid var(--accent);
+      padding-left: 1.5rem;
+      margin-bottom: 3rem;
+      opacity: 0;
+      animation: fadeUp 0.5s 0.15s ease forwards;
+    }
+    .hero h1 {
+      font-family: var(--mono);
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      line-height: 1.1;
+    }
+    .hero h1 span { color: var(--accent); }
+    .hero .title-line {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--accent2);
+      margin-top: 0.5rem;
+      letter-spacing: 0.08em;
+    }
+    .hero .tagline {
+      color: var(--muted);
+      font-size: 15px;
+      font-weight: 300;
+      margin-top: 0.75rem;
+      max-width: 520px;
+      font-style: italic;
+    }
+
+    /* ── Contact strip ── */
+    .contact-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1.5rem;
+      margin-bottom: 3rem;
+      font-family: var(--mono);
+      font-size: 12px;
+      opacity: 0;
+      animation: fadeUp 0.5s 0.25s ease forwards;
+    }
+    .contact-strip a, .contact-strip span {
+      color: var(--muted);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: color 0.2s;
+    }
+    .contact-strip a:hover { color: var(--accent); }
+    .contact-strip .icon { color: var(--accent); font-size: 14px; }
+
+    /* ── Section ── */
+    .section {
+      margin-bottom: 3rem;
+      opacity: 0;
+      animation: fadeUp 0.5s ease forwards;
+    }
+    .section:nth-child(4) { animation-delay: 0.35s; }
+    .section:nth-child(5) { animation-delay: 0.45s; }
+    .section:nth-child(6) { animation-delay: 0.55s; }
+    .section:nth-child(7) { animation-delay: 0.65s; }
+    .section:nth-child(8) { animation-delay: 0.75s; }
+    .section:nth-child(9) { animation-delay: 0.85s; }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+    .section-header .label {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .section-header::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── Summary ── */
+    .summary {
+      color: var(--muted);
+      font-weight: 300;
+      max-width: 680px;
+      font-size: 15px;
+    }
+
+    /* ── Skills grid ── */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 0.75rem;
+    }
+    .skill-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.85rem 1rem;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .skill-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .skill-card .sk-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--accent2);
+      letter-spacing: 0.05em;
+      margin-bottom: 0.35rem;
+    }
+    .skill-card .sk-value {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* ── Experience ── */
+    .job {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+      transition: border-color 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .job::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--border);
+      transition: background 0.2s;
+    }
+    .job:hover { border-color: #30363d; }
+    .job:hover::before { background: var(--accent); }
+
+    .job-meta {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.25rem;
+      margin-bottom: 0.6rem;
+    }
+    .job-title {
+      font-family: var(--mono);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .job-company { color: var(--accent); font-size: 13px; font-family: var(--mono); }
+    .job-dates {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .job-location {
+      font-size: 12px;
+      color: var(--muted);
+      width: 100%;
+      margin-bottom: 0.75rem;
+    }
+    .job ul {
+      list-style: none;
+      padding: 0;
+    }
+    .job ul li {
+      font-size: 13.5px;
+      color: var(--muted);
+      padding: 0.2rem 0 0.2rem 1.25rem;
+      position: relative;
+      line-height: 1.6;
+    }
+    .job ul li::before {
+      content: '▸';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-size: 11px;
+      top: 0.3rem;
+    }
+    .job ul li strong { color: var(--text); font-weight: 600; }
+
+    /* ── Tags ── */
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.75rem;
+    }
+    .tag {
+      font-family: var(--mono);
+      font-size: 11px;
+      background: var(--tag-bg);
+      color: var(--muted);
+      padding: 0.15rem 0.6rem;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+
+    /* ── Certs ── */
+    .cert-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 0.75rem;
+    }
+    .cert-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+    .cert-badge {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 600;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .badge-active { background: rgba(63,185,80,0.15); color: var(--accent2); border: 1px solid rgba(63,185,80,0.3); }
+    .badge-progress { background: rgba(88,166,255,0.12); color: var(--accent); border: 1px solid rgba(88,166,255,0.3); }
+    .badge-prior { background: rgba(139,148,158,0.1); color: var(--muted); border: 1px solid var(--border); }
+    .cert-name { font-size: 13px; color: var(--text); line-height: 1.4; }
+    .cert-sub { font-size: 11px; color: var(--muted); margin-top: 1px; font-family: var(--mono); }
+
+    /* ── Education ── */
+    .edu-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 0.75rem;
+    }
+    .edu-degree { font-size: 14px; color: var(--text); font-weight: 600; }
+    .edu-school { font-family: var(--mono); font-size: 12px; color: var(--accent); margin-top: 0.2rem; }
+    .edu-note { font-size: 12px; color: var(--muted); margin-top: 0.25rem; }
+
+    /* ── Visit counter ── */
+    .counter-bar {
+      margin-top: 4rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .counter-bar .count {
+      color: var(--accent2);
+      font-weight: 600;
+      font-size: 14px;
+    }
+    #visit-count { color: var(--accent2); }
+
+    /* ── Animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .shell { padding: 1.5rem 1rem 4rem; }
+      .hero h1 { font-size: 2rem; }
+      .job-meta { flex-direction: column; }
+    }
+
+    /* ── Print ── */
+    @media print {
+      body { background: white; color: black; }
+      .prompt-bar, .counter-bar { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- Terminal chrome -->
+  <div class="prompt-bar">
+    <span class="dot dot-r"></span>
+    <span class="dot dot-y"></span>
+    <span class="dot dot-g"></span>
+    <span class="path">~/howell-strain</span>
+    <span class="cmd">$ cat resume.md</span>
+    <span class="cursor"></span>
+  </div>
+
+  <!-- Hero -->
+  <header class="hero">
+    <h1>Howell <span>Strain</span></h1>
+    <div class="title-line">// Infrastructure & Automation Engineer</div>
+    <p class="tagline">Helping organizations solve process problems with technology — 25+ years in MSP and enterprise IT.</p>
+  </header>
+
+  <!-- Contact -->
+  <div class="contact-strip">
+    <a href="tel:4233095073"><span class="icon">📞</span>(423) 309-5073</a>
+    <a href="mailto:hs@howellstrain.com"><span class="icon">✉</span>hs@howellstrain.com</a>
+    <span><span class="icon">📍</span>Chattanooga, TN</span>
+    <a href="https://linkedin.com/in/howell-strain" target="_blank"><span class="icon">🔗</span>linkedin.com/in/howell-strain</a>
+    <a href="https://github.com/whstrain" target="_blank"><span class="icon">⌥</span>github.com/whstrain</a>
+  </div>
+
+  <!-- Summary -->
+  <section class="section">
+    <div class="section-header"><span class="label">Summary</span></div>
+    <p class="summary">
+      Automation-minded infrastructure engineer with 25+ years of MSP and enterprise IT experience.
+      Skilled at identifying inefficient manual processes and replacing them with reliable, documented automated workflows.
+      Deep background in Microsoft 365, Azure, Entra ID, and PowerShell scripting.
+      Security-conscious practitioner with CISSP in reinstatement and a B.S. in Cybersecurity — ensuring automation work meets compliance and SOC standards.
+      Known for translating complex technical solutions into clear business value.
+    </p>
+  </section>
+
+  <!-- Skills -->
+  <section class="section">
+    <div class="section-header"><span class="label">Core Competencies</span></div>
+    <div class="skills-grid">
+      <div class="skill-card">
+        <div class="sk-label">Automation & Scripting</div>
+        <div class="sk-value">PowerShell · Workflow design & automation · Device imaging/provisioning automation</div>
+      </div>
+      <div class="skill-card">
+        <div class="sk-label">Cloud & Microsoft 365</div>
+        <div class="sk-value">Azure (AZ-900, AZ-104 in progress) · Entra ID · Exchange Online · AD Connect · Conditional Access · MFA · SAML/SSO</div>
+      </div>
+      <div class="skill-card">
+        <div class="sk-label">MSP Tools & Platforms</div>
+        <div class="sk-value">PSA · RMM · Documentation platforms · SOC compliance</div>
+      </div>
+      <div class="skill-card">
+        <div class="sk-label">Infrastructure</div>
+        <div class="sk-value">Active Directory · PKI/RADIUS/802.1x · SD-WAN · Virtualization · Network architecture</div>
+      </div>
+      <div class="skill-card">
+        <div class="sk-label">Security & Compliance</div>
+        <div class="sk-value">CISSP (reinstatement in progress) · Cybersecurity degree · SOC compliance · Risk assessment</div>
+      </div>
+      <div class="skill-card">
+        <div class="sk-label">Stakeholder & Communication</div>
+        <div class="sk-value">Requirements gathering · Technical writing · Training & enablement · Cross-functional collaboration</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Experience -->
+  <section class="section">
+    <div class="section-header"><span class="label">Experience</span></div>
+
+    <div class="job">
+      <div class="job-meta">
+        <div>
+          <div class="job-title">Network & Systems Engineer (L2)</div>
+          <div class="job-company">NetGain Technologies</div>
+        </div>
+        <div class="job-dates">Sep 2025 – Present</div>
+      </div>
+      <div class="job-location">Chattanooga, TN</div>
+      <ul>
+        <li>Provide advanced technical support across managed client environments within MSP service delivery framework.</li>
+        <li>Work within PSA/RMM toolsets daily, developing firsthand insight into clients' manual workflow inefficiencies suitable for automation.</li>
+        <li>Support Microsoft 365, Entra ID, and Azure environments across a diverse client base.</li>
+      </ul>
+      <div class="tags">
+        <span class="tag">M365</span><span class="tag">Entra ID</span><span class="tag">Azure</span><span class="tag">PSA</span><span class="tag">RMM</span>
+      </div>
+    </div>
+
+    <div class="job">
+      <div class="job-meta">
+        <div>
+          <div class="job-title">Solutions Engineer / vCIO</div>
+          <div class="job-company">WYRE Technology</div>
+        </div>
+        <div class="job-dates">2024 – Early 2025</div>
+      </div>
+      <div class="job-location">Chattanooga, TN</div>
+      <ul>
+        <li>Identified and prevented a <strong>$37,000 software licensing compliance violation</strong> through proactive audit and remediation.</li>
+        <li>Served as virtual CIO for SMB clients, translating technical roadmaps into budget-aligned business outcomes.</li>
+        <li>Designed and delivered client infrastructure assessments, security posture reviews, and technology roadmaps.</li>
+      </ul>
+      <div class="tags">
+        <span class="tag">vCIO</span><span class="tag">Security Audit</span><span class="tag">Roadmapping</span><span class="tag">Licensing Compliance</span>
+      </div>
+    </div>
+
+    <div class="job">
+      <div class="job-meta">
+        <div>
+          <div class="job-title">Co-Owner / Operations & Technology</div>
+          <div class="job-company">Good Fortune Soap</div>
+        </div>
+        <div class="job-dates">Feb 2020 – Feb 2023</div>
+      </div>
+      <div class="job-location">Chattanooga, TN</div>
+      <ul>
+        <li>Built all technology systems from scratch: e-commerce platform, inventory management, fulfillment workflows, and POS integration.</li>
+        <li>Automated order processing and fulfillment, enabling a two-person team to manage high-volume operations efficiently.</li>
+        <li>Developed SOPs and process documentation for all operational workflows.</li>
+      </ul>
+      <div class="tags">
+        <span class="tag">Process Automation</span><span class="tag">E-commerce</span><span class="tag">SOPs</span><span class="tag">Systems Design</span>
+      </div>
+    </div>
+
+    <div class="job">
+      <div class="job-meta">
+        <div>
+          <div class="job-title">Infrastructure Architect</div>
+          <div class="job-company">Covenant Logistics Group</div>
+        </div>
+        <div class="job-dates">Feb 2018 – 2019</div>
+      </div>
+      <div class="job-location">Chattanooga, TN</div>
+      <ul>
+        <li>Delivered <strong>$25,000/month in SD-WAN cost savings</strong> by redesigning WAN architecture across 60+ locations — identified opportunity, built business case, and executed migration.</li>
+        <li>Architected enterprise-wide infrastructure strategy including network, cloud migration planning, and security posture improvements.</li>
+        <li>Served as trusted technical advisor to senior leadership, translating architectural decisions into business and risk terms.</li>
+      </ul>
+      <div class="tags">
+        <span class="tag">SD-WAN</span><span class="tag">Architecture</span><span class="tag">Cloud Migration</span><span class="tag">Cost Optimization</span>
+      </div>
+    </div>
+
+    <div class="job">
+      <div class="job-meta">
+        <div>
+          <div class="job-title">Network Engineer → Senior Infrastructure Engineer</div>
+          <div class="job-company">Covenant Logistics Group</div>
+        </div>
+        <div class="job-dates">Jun 2011 – Feb 2018</div>
+      </div>
+      <div class="job-location">Chattanooga, TN</div>
+      <ul>
+        <li>Automated device provisioning for Mobile Images division: <strong>reduced build time from 4 hours to 2 hours per device</strong>, enabling faster fleet deployment at scale.</li>
+        <li>Built and managed a 700-user Remote Desktop Services farm solo, including capacity planning, deployment, and optimization.</li>
+        <li>Executed full Exchange 2003 → Exchange Online migration with zero data loss across coexistence, directory sync, and cutover.</li>
+        <li>Redesigned Active Directory and consolidated domain controllers; built PKI/RADIUS/802.1x infrastructure for network access control.</li>
+      </ul>
+      <div class="tags">
+        <span class="tag">PowerShell</span><span class="tag">RDS</span><span class="tag">Exchange</span><span class="tag">Active Directory</span><span class="tag">PKI</span><span class="tag">802.1x</span><span class="tag">VMware</span>
+      </div>
+    </div>
+
+    <div class="job">
+      <div class="job-meta">
+        <div>
+          <div class="job-title">Systems & Network Engineer</div>
+          <div class="job-company">NetAlliant (MSP)</div>
+        </div>
+        <div class="job-dates">2005 – 2009</div>
+      </div>
+      <div class="job-location">Chattanooga, TN</div>
+      <ul>
+        <li>Designed and managed multi-client MSP environments including virtualization, SAN storage, firewalls, and Microsoft infrastructure.</li>
+        <li>Wrote automation scripts to streamline repetitive administrative tasks across managed client environments.</li>
+      </ul>
+      <div class="tags">
+        <span class="tag">Citrix XenServer</span><span class="tag">XenDesktop</span><span class="tag">SAN</span><span class="tag">WatchGuard</span><span class="tag">MSP</span>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- Certifications -->
+  <section class="section">
+    <div class="section-header"><span class="label">Certifications</span></div>
+    <div class="cert-grid">
+      <div class="cert-card">
+        <span class="cert-badge badge-active">ACTIVE</span>
+        <div>
+          <div class="cert-name">AZ-900</div>
+          <div class="cert-sub">Microsoft Azure Fundamentals</div>
+        </div>
+      </div>
+      <div class="cert-card">
+        <span class="cert-badge badge-progress">IN PROGRESS</span>
+        <div>
+          <div class="cert-name">AZ-104</div>
+          <div class="cert-sub">Azure Administrator</div>
+        </div>
+      </div>
+      <div class="cert-card">
+        <span class="cert-badge badge-progress">REINSTATEMENT</span>
+        <div>
+          <div class="cert-name">CISSP</div>
+          <div class="cert-sub">120 CPE path — ISC²</div>
+        </div>
+      </div>
+      <div class="cert-card">
+        <span class="cert-badge badge-prior">PRIOR</span>
+        <div>
+          <div class="cert-name">CCSP · SSCP · ITIL v3</div>
+          <div class="cert-sub">Project+ · Security+ · Network+ · A+</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Education -->
+  <section class="section">
+    <div class="section-header"><span class="label">Education</span></div>
+    <div class="edu-card">
+      <div class="edu-degree">B.S. Cybersecurity & Information Assurance</div>
+      <div class="edu-school">Western Governors University — September 2020</div>
+    </div>
+    <div class="edu-card">
+      <div class="edu-degree">150+ Credit Hours — Engineering, Computer Science & Mathematics</div>
+      <div class="edu-school">University of Tennessee at Chattanooga / Purdue University — 1992–1998</div>
+      <div class="edu-note">Coursework in Mechanical Engineering, Computer Science, and Mathematics</div>
+    </div>
+  </section>
+
+  <!-- Visit counter (Cloud Resume Challenge requirement) -->
+  <div class="counter-bar">
+    <span>// visitor count:</span>
+    <span id="visit-count" class="count">—</span>
+    <span>· powered by Azure Functions + Cosmos DB</span>
+  </div>
+
+</div>
+
+<script>
+  // Cloud Resume Challenge: visitor counter
+  // Replace this URL with your deployed Azure Function endpoint
+  async function loadVisitorCount() {
+    try {
+const res = await fetch('https://func-cloud-resume-test-001-ftcuhvfbf8d8b8a7.southcentralus-01.azurewebsites.net/api/getvisitorcount');      if (!res.ok) throw new Error();
+      const data = await res.json();
+      document.getElementById('visit-count').textContent = data.count.toLocaleString();
+    } catch {
+      document.getElementById('visit-count').textContent = '–';
+    }
+  }
+  loadVisitorCount();
+</script>
+</body>
+</html>
