@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cloud Resume Challenge — Architecture</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600&display=swap');
+
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --accent: #58a6ff;
+    --accent2: #3fb950;
+    --accent3: #f78166;
+    --accent4: #d2a8ff;
+    --text: #c9d1d9;
+    --muted: #6e7681;
+    --font-mono: 'IBM Plex Mono', monospace;
+    --font-sans: 'IBM Plex Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    padding: 40px 20px;
+    min-height: 100vh;
+  }
+
+  h1 {
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--accent);
+    text-align: center;
+    margin-bottom: 8px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .subtitle {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-align: center;
+    margin-bottom: 40px;
+    letter-spacing: 0.03em;
+  }
+
+  .diagram {
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  /* ROWS */
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 0;
+    position: relative;
+  }
+
+  /* BOXES */
+  .box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 18px;
+    text-align: center;
+    position: relative;
+    min-width: 140px;
+  }
+
+  .box .icon {
+    font-size: 1.4rem;
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  .box .label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 3px;
+  }
+
+  .box .sublabel {
+    font-family: var(--font-sans);
+    font-size: 0.62rem;
+    color: var(--muted);
+    display: block;
+    line-height: 1.4;
+  }
+
+  .box.user { border-color: var(--accent); }
+  .box.user .label { color: var(--accent); }
+
+  .box.cloudflare { border-color: #f6821f; }
+  .box.cloudflare .label { color: #f6821f; }
+
+  .box.storage { border-color: var(--accent); }
+  .box.storage .label { color: var(--accent); }
+
+  .box.function { border-color: var(--accent2); }
+  .box.function .label { color: var(--accent2); }
+
+  .box.cosmos { border-color: var(--accent4); }
+  .box.cosmos .label { color: var(--accent4); }
+
+  .box.github { border-color: var(--text); }
+  .box.github .label { color: var(--text); }
+
+  .box.region-badge {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    color: var(--muted);
+    border: 1px dashed var(--border);
+    border-radius: 4px;
+    padding: 2px 6px;
+    display: inline-block;
+    margin-top: 4px;
+  }
+
+  /* ARROWS */
+  .arrow {
+    display: flex;
+    align-items: center;
+    padding: 0 6px;
+    position: relative;
+  }
+
+  .arrow svg {
+    overflow: visible;
+  }
+
+  .arrow .arrow-label {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    color: var(--muted);
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+  }
+
+  /* VERTICAL CONNECTOR */
+  .vconnector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .vline {
+    width: 1px;
+    height: 36px;
+    background: var(--border);
+    position: relative;
+  }
+
+  .vline::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 6px solid var(--border);
+  }
+
+  .vlabel {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    color: var(--muted);
+    margin: 2px 0;
+  }
+
+  /* SECTION GROUPS */
+  .group {
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 0;
+    position: relative;
+  }
+
+  .group-label {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    color: var(--muted);
+    position: absolute;
+    top: -10px;
+    left: 12px;
+    background: var(--bg);
+    padding: 0 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* LAYOUT SECTIONS */
+  .section {
+    margin-bottom: 8px;
+  }
+
+  /* HLINE connector */
+  .hline {
+    height: 1px;
+    background: var(--border);
+    position: relative;
+    flex: 1;
+    min-width: 20px;
+    max-width: 50px;
+  }
+
+  .hline.right::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    border-left: 6px solid var(--border);
+  }
+
+  .hline.left::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    border-right: 6px solid var(--border);
+  }
+
+  /* GITHUB SECTION */
+  .github-section {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 8px;
+  }
+
+  .github-repo {
+    border: 1px dashed var(--border);
+    border-radius: 6px;
+    padding: 12px 14px;
+    text-align: center;
+    min-width: 180px;
+  }
+
+  .github-repo .repo-label {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--text);
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .pipeline-step {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    color: var(--muted);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 3px 6px;
+    margin: 3px 0;
+    display: block;
+    text-align: left;
+  }
+
+  .pipeline-step.green { color: var(--accent2); border-color: var(--accent2); }
+  .pipeline-step.blue { color: var(--accent); border-color: var(--accent); }
+
+  /* CROSS REGION NOTE */
+  .cross-region {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    color: var(--accent3);
+    text-align: center;
+    margin: 4px 0 8px;
+    padding: 4px 10px;
+    border: 1px dashed var(--accent3);
+    border-radius: 4px;
+    display: inline-block;
+  }
+
+  .cross-region-wrap {
+    text-align: center;
+    margin: 6px 0;
+  }
+
+  /* LEGEND */
+  .legend {
+    max-width: 900px;
+    margin: 24px auto 0;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    color: var(--muted);
+  }
+
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+</style>
+</head>
+<body>
+
+<h1>Cloud Resume Challenge — Architecture</h1>
+<div class="subtitle">resumetest.howellstrain.com · Azure + Cloudflare + GitHub Actions</div>
+
+<div class="diagram">
+
+  <!-- USER -->
+  <div class="section" style="display:flex; justify-content:center;">
+    <div class="box user">
+      <span class="icon">👤</span>
+      <span class="label">User</span>
+      <span class="sublabel">Browser request<br>resumetest.howellstrain.com</span>
+    </div>
+  </div>
+
+  <!-- User → Cloudflare -->
+  <div class="vconnector" style="width:100px;">
+    <div class="vline"></div>
+    <span class="vlabel">HTTPS</span>
+    <div class="vline" style="height:10px; background:transparent;"></div>
+  </div>
+
+  <!-- CLOUDFLARE -->
+  <div class="section" style="display:flex; justify-content:center;">
+    <div class="box cloudflare">
+      <span class="icon">🟠</span>
+      <span class="label">Cloudflare</span>
+      <span class="sublabel">CDN · HTTPS termination<br>Custom domain (CNAME)<br>Free tier · HTML not cached</span>
+    </div>
+  </div>
+
+  <!-- Cloudflare → Storage -->
+  <div class="vconnector" style="width:100px;">
+    <div class="vline"></div>
+    <span class="vlabel">origin request</span>
+    <div class="vline" style="height:10px; background:transparent;"></div>
+  </div>
+
+  <!-- FRONTEND GROUP -->
+  <div class="section">
+    <div class="group">
+      <span class="group-label">Azure — South Central US</span>
+      <div style="display:flex; align-items:center; justify-content:center; gap:0;">
+
+        <!-- Azure Storage -->
+        <div class="box storage">
+          <span class="icon">🗄️</span>
+          <span class="label">Azure Storage</span>
+          <span class="sublabel">Static website hosting<br>HTML · CSS · JS</span>
+        </div>
+
+        <!-- Storage → Function arrow -->
+        <div class="arrow" style="width:80px;">
+          <div class="hline right" style="flex:1;"></div>
+          <span class="arrow-label">JS fetch()</span>
+        </div>
+
+        <!-- Azure Function -->
+        <div class="box function">
+          <span class="icon">⚡</span>
+          <span class="label">Azure Function</span>
+          <span class="sublabel">HTTP trigger · Python<br>Read · increment · write<br>Returns JSON count</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Cross-region note + CosmosDB -->
+  <div class="cross-region-wrap">
+    <span class="cross-region">⚠ cross-region · Function: South Central US → CosmosDB: Central US</span>
+  </div>
+
+  <!-- COSMOS -->
+  <div class="section" style="display:flex; justify-content:center;">
+    <div class="box cosmos">
+      <span class="icon">🪐</span>
+      <span class="label">CosmosDB Table API</span>
+      <span class="sublabel">NoSQL key-value store<br>Visitor counter · Central US<br><em>(alternate region)</em></span>
+    </div>
+  </div>
+
+  <!-- DIVIDER -->
+  <div style="height:32px; display:flex; align-items:center; justify-content:center;">
+    <div style="width:60%; height:1px; background: var(--border); opacity:0.4;"></div>
+  </div>
+
+  <!-- GITHUB SECTION -->
+  <div class="section">
+    <div class="group">
+      <span class="group-label">Source Control + CI/CD — GitHub Actions</span>
+      <div class="github-section">
+
+        <!-- Frontend Repo -->
+        <div class="github-repo">
+          <span class="repo-label">📁 frontend repo</span>
+          <span class="pipeline-step">trigger: push to main</span>
+          <span class="pipeline-step blue">→ deploy to Azure Storage</span>
+          <span class="pipeline-step" style="margin-top:6px; color: #f6821f; border-color: #f6821f;">note: HTML not cached by CF</span>
+        </div>
+
+        <!-- Backend Repo -->
+        <div class="github-repo">
+          <span class="repo-label">📁 backend repo</span>
+          <span class="pipeline-step">trigger: push to main</span>
+          <span class="pipeline-step green">→ pytest unit tests</span>
+          <span class="pipeline-step blue">→ deploy Azure Function</span>
+        </div>
+
+      </div>
+
+      <div style="text-align:center; margin-top:10px;">
+        <span class="pipeline-step" style="display:inline-block; color: var(--muted);">auth: Azure credentials → GitHub Secrets &nbsp;|&nbsp; IaC: Bicep (reference, not deployed)</span>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#58a6ff;"></div>Azure / Frontend</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#3fb950;"></div>Azure Function / Backend</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#d2a8ff;"></div>CosmosDB</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f6821f;"></div>Cloudflare</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f78166;"></div>Cross-region note</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#6e7681;"></div>GitHub Actions</div>
+</div>
+
+</body>
+</html>
